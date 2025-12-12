@@ -287,35 +287,44 @@
     }
   }
 
-  // ===== 파티클 =====
   function createParticles() {
-    const container = document.getElementById('snow-container');
-    if (!container) return;
-    container.innerHTML = '';
-    const count = 30;
+  const container = document.getElementById('snow-container');
+  if (!container) return;
+  container.innerHTML = '';
+  const count = 40;
 
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement('div');
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
 
-      if (isEscaped) {
-        p.className = 'confetti-particle';
-        p.style.backgroundColor = ['#FFD700', '#FFFFFF', '#00BFFF', '#FF69B4'][Math.floor(Math.random() * 4)];
-        p.style.bottom = '-10px';
-        p.style.animationName = 'rise';
-      } else {
-        p.className = 'snowflake';
-        p.textContent = '❄';
-        p.style.top = '-10px';
-        p.style.animationName = 'fall, shake-snow';
-      }
+    const dur = (Math.random() * 3 + 2).toFixed(2);     // 2~5초
+    const delay = (Math.random() * 2).toFixed(2);       // 0~2초
+    const left = (Math.random() * 100).toFixed(2);
 
-      p.style.left = (Math.random() * 100) + '%';
-      p.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      p.style.fontSize = isEscaped ? '10px' : (Math.random() * 10 + 10) + 'px';
+    if (isEscaped) {
+      // 탈출 성공: 위로 올라가는 파티클 (무한 반복)
+      p.className = 'confetti-particle';
+      p.style.backgroundColor = ['#FFD700', '#FFF', '#00BFFF', '#FF69B4'][Math.floor(Math.random() * 4)];
+      p.style.left = left + '%';
+      p.style.bottom = '-10px';
 
-      container.appendChild(p);
+      // ✅ 핵심: animation을 통으로 지정 + infinite
+      p.style.animation = `rise ${dur}s ease-out ${delay}s infinite`;
+    } else {
+      // 기본: 눈송이 (무한 반복)
+      p.className = 'snowflake';
+      p.textContent = '❄';
+      p.style.left = left + '%';
+      p.style.top = '-10px';
+      p.style.fontSize = (Math.random() * 10 + 10).toFixed(0) + 'px';
+
+      // ✅ 핵심: fall + shake를 각각 무한 반복
+      p.style.animation = `fall ${dur}s linear ${delay}s infinite, shake-snow 1.8s ease-in-out ${delay}s infinite`;
     }
+
+    container.appendChild(p);
   }
+}
+
 
   // ===== 카운트다운 =====
   function updateCountdown() {
@@ -486,3 +495,4 @@
 
 </body>
 </html>
+
