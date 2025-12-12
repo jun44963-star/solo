@@ -1,0 +1,432 @@
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16"></p>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<p data-ke-size="size16"></p>
+<!-- 위젯 시작 -->
+<div id="solo-xmas-widget" class="w-full max-w-lg mx-auto rounded-3xl shadow-2xl p-6 md:p-8 text-center border-4 border-yellow-400/30 relative"><!-- 눈송이/파티클 생성 영역 -->
+<div id="snow-container">&nbsp;</div>
+<!-- [추가] 공유 버튼 (좌측 상단) -->
+<div class="absolute top-4 left-4 z-50 cursor-pointer">
+<div class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-300 hover:bg-black/60 transition-all border border-gray-500/50"><i data-lucide="share-2"></i> <span>공유</span></div>
+</div>
+<!-- 배경음악 컨트롤 (우측 상단) -->
+<div class="absolute top-4 right-4 z-50 cursor-pointer">
+<div id="music-btn" class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-300 hover:bg-black/60 transition-all border border-gray-500/50"><i data-lucide="music"></i> <span>BGM ON</span></div>
+</div>
+<!-- 헤더 --> <!-- 로고 5회 클릭 시 강제 탈출 모드 발동 (이스터에그) --><header class="relative z-10 mb-8 mt-8 cursor-pointer select-none">
+<div class="flex justify-center items-center gap-2 mb-2">&nbsp;</div>
+<h1 id="main-title" class="text-3xl md:text-4xl font-jua text-white drop-shadow-lg mb-2">Merry <span class="text-yellow-300">Solo</span> Christmas</h1>
+<p id="sub-title" class="text-blue-100 text-sm md:text-base opacity-90" data-ke-size="size16">커플들은 춥지만, 우리는 집이라 따뜻하다.</p>
+</header><!-- 1. 크리스마스 탈출 카운트다운 -->
+<div id="countdown-box" class="relative z-10 bg-black/30 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20 transition-colors">
+<h2 id="countdown-title" class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-red-300" data-ke-size="size26"><i data-lucide="timer"></i> <span class="font-jua text-xl">크리스마스 탈출까지</span></h2>
+<div id="countdown" class="text-3xl md:text-5xl font-mono font-bold text-white tracking-widest drop-shadow-md">0일 00:00:00</div>
+<p id="countdown-desc" class="text-xs text-gray-300 mt-2" data-ke-size="size16">12월 26일이 오면 우리는 승리한다.</p>
+</div>
+<!-- 2. 솔로 활동 랜덤 추천기 -->
+<div class="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 mb-6 border border-white/20">
+<h2 class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-green-300" data-ke-size="size26"><i data-lucide="gamepad-2"></i> <span class="font-jua text-xl">오늘 뭐하지? (랜덤 추천)</span></h2>
+<div id="activity-display" class="bg-white/90 rounded-xl p-4 min-h-[120px] flex items-center justify-center mb-4 shadow-inner">
+<p id="activity-text" class="font-bold font-jua" data-ke-size="size16">버튼을 눌러보세요!</p>
+</div>
+<button class="btn-hover px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-full font-bold transition-all shadow-lg flex items-center justify-center gap-2 mx-auto w-full md:w-auto"> <i data-lucide="dices"></i> 운명에 맡기기 </button></div>
+<!-- 3. 오늘의 명언 -->
+<div class="relative z-10 mt-8 mb-6">
+<div class="inline-block bg-black/40 px-4 py-2 rounded-full text-sm text-yellow-200 border border-yellow-500/30"><i data-lucide="quote"></i> <span>산타클로스도 사실 독거노인이다.</span></div>
+</div>
+<!-- 제작자 링크 -->
+<div class="relative z-10 pt-4 border-t border-white/10"><a class="text-xs text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-1" style="color: #cbd5e1 !important;" href="https://hjkim20089.tistory.com/" target="_blank" rel="noopener"> <i data-lucide="home"></i> Made by HJKIM </a></div>
+</div>
+<script>
+        let isEscaped = false; // 탈출 상태 플래그
+        let eggCount = 0; // 이스터에그 카운트
+
+        // 1. 눈 내리는 효과 (기본) -> 파티클 효과 (탈출 시)
+        function createParticles() {
+            const container = document.getElementById('snow-container');
+            container.innerHTML = ''; // 초기화
+            const count = 30;
+            
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                
+                if (isEscaped) {
+                    // 탈출 성공 시: 화려한 파티클 (위로 올라감)
+                    p.classList.add('confetti-particle');
+                    p.style.backgroundColor = ['#FFD700', '#FFF', '#00BFFF', '#FF69B4'][Math.floor(Math.random() * 4)];
+                    p.style.bottom = '-10px';
+                    p.style.animationName = 'rise';
+                } else {
+                    // 기본: 눈송이 (아래로 떨어짐)
+                    p.classList.add('snowflake');
+                    p.innerHTML = '❄';
+                    p.style.top = '-10px';
+                    p.style.animationName = 'fall, shake-snow';
+                }
+
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (Math.random() * 3 + 2) + 's'; // 속도 랜덤
+                p.style.fontSize = isEscaped ? '10px' : (Math.random() * 10 + 10) + 'px';
+                
+                container.appendChild(p);
+            }
+        }
+
+        // 2. 카운트다운 로직
+        function updateCountdown() {
+            if (isEscaped) return; // 이미 탈출했으면 업데이트 중지
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            // 목표: 올해 12월 26일 00:00:00
+            // 테스트를 위해 날짜를 변경하려면 여기를 수정하세요.
+            let target = new Date(currentYear, 11, 26, 0, 0, 0); 
+
+            // 현재 시간이 12월 26일을 지났다면? (탈출 성공!)
+            // 로직상 12/26 00:00:00 ~ 12/31 사이라면 탈출 성공 상태로 간주
+            // 그 외에는 내년 크리스마스를 기다림
+            if (now >= target && now.getMonth() === 11 && now.getDate() >= 26) {
+                celebrateEscape();
+                return;
+            } else if (now > target) {
+                target = new Date(currentYear + 1, 11, 26, 0, 0, 0);
+            }
+
+            const diff = target - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const h = hours < 10 ? "0" + hours : hours;
+            const m = minutes < 10 ? "0" + minutes : minutes;
+            const s = seconds < 10 ? "0" + seconds : seconds;
+
+            document.getElementById('countdown').innerText = `${days}일 ${h}:${m}:${s}`;
+        }
+
+        // [핵심] 탈출 성공 모드 전환 함수
+        function celebrateEscape() {
+            if (isEscaped) return;
+            isEscaped = true;
+
+            // 1. 화면 스타일 변경
+            const widget = document.getElementById('solo-xmas-widget');
+            widget.classList.add('escaped');
+
+            // 2. 텍스트 변경
+            document.getElementById('main-title').innerHTML = `🎉 SOLO <span class="text-white drop-shadow-md">VICTORY!</span>`;
+            document.getElementById('sub-title').innerText = "우리는 살아남았다! 자유를 만끽하라!";
+            
+            document.getElementById('countdown-title').innerHTML = `<i data-lucide="trophy" class="w-5 h-5 text-yellow-400"></i><span class="font-jua text-xl text-yellow-300">미션 클리어</span>`;
+            document.getElementById('countdown').innerText = "MISSION COMPLETE";
+            document.getElementById('countdown').classList.add('text-yellow-200');
+            document.getElementById('countdown-desc').innerText = "커플들의 축제는 끝났다. 이제 우리의 세상이다.";
+
+            // 3. 아이콘 변경
+            document.getElementById('header-icon-1').setAttribute('data-lucide', 'crown');
+            document.getElementById('header-icon-2').setAttribute('data-lucide', 'thumbs-up');
+            lucide.createIcons();
+
+            // 4. 파티클(눈송이) 변경
+            createParticles();
+
+            // 5. 음악 변경 (만약 재생 중이라면 즉시 변경)
+            if (isPlaying) {
+                toggleMusic(); // 끄고
+                setTimeout(toggleMusic, 100); // 다시 켜서 새 음악 재생
+            } else {
+                // 음악이 꺼져있다면 버튼 텍스트만 업데이트
+                const btnText = document.getElementById('music-text');
+                btnText.textContent = "Victory BGM";
+            }
+        }
+
+        // 이스터에그 (제목 5번 클릭 시 강제 탈출)
+        function triggerEasterEgg() {
+            if (isEscaped) return;
+            eggCount++;
+            if (eggCount >= 5) {
+                celebrateEscape();
+                alert("🛠️ 개발자 치트키 발동! 탈출 성공!");
+            }
+        }
+
+        function shareLink() {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alert("링크가 복사되었습니다! 솔로 친구들에게 전파하세요 🎄");
+        }
+
+        // 3. 데이터 (활동 50개 이상, 명언 50개 이상)
+        const activities = [
+            "🍕 치킨+피자 시키고 '나홀로 집에' 정주행", "🎮 밀린 게임 엔딩 볼 때까지 못 잠", "📚 만화카페 가서 짜장라면에 뒹굴기",
+            "💤 24시간 동면 (일어나면 26일임)", "🍜 뜨끈한 국밥 한 그릇 때리고 사우나", "🧹 대청소하고 새 마음으로 새해 맞이하기",
+            "🍰 편의점 케이크 사서 혼자 다 퍼먹기", "🎬 해리포터 시리즈 정주행 (마법사의 길)", "🛍️ 나에게 주는 선물 쇼핑 (플렉스!)",
+            "🍺 혼술하며 옛날 예능 하이라이트 보기", "🎤 코인노래방 가서 1만원어치 지르기", "🏃‍♂️ 아무도 없는 헬스장에서 황제 헬스",
+            "🧩 1000피스 직소 퍼즐 맞추기 도전", "📱 유튜브 알고리즘 탐험하며 시간 순삭", "🍳 유튜브 보고 백종원 레시피 따라하기",
+            "🛀 거품 입욕제 넣고 뜨끈한 반신욕", "✍️ 내년 계획 다이어리에 끄적이기", "🍫 누텔라 한 통 숟가락으로 퍼먹기",
+            "🏰 레고 조립하며 무념무상 즐기기", "🐱 고양이/강아지 츄르 주며 주인님 모시기", "🍿 넷플릭스 랭킹 1위부터 5위까지 정복",
+            "🎸 방구석 기타/피아노 연주회 개최", "🥡 마라탕 최고 매운맛 + 꿔바로우 도전", "💇‍♂️ 미용실 가서 파격적인 스타일 변신",
+            "🧟‍♂️ '킹덤'이나 '워킹데드' 좀비물 정주행", "🛌 전기장판 틀고 귤 까먹으며 웹툰 정주행", "🥩 혼자 고깃집 가서 3인분 클리어 도전",
+            "🎨 컬러링북 색칠하며 힐링하기", "🔨 다이소 가서 꿀템 쇼핑하고 집 꾸미기", "📷 옛날 사진첩 보며 추억 여행 (흑역사 주의)",
+            "👟 동네 산책하며 커플들 구경하고 비웃기", "📜 밀린 드라마 몰아보기 (스킵 없이)", "🍞 빵지순례 다녀와서 빵 파티",
+            "🧘‍♂️ 명상하며 내면의 평화 찾기", "💻 안 하던 블로그 글 하나 써보기", "🧼 화장실 타일 줄눈 청소 (중독성 있음)",
+            "🥣 시리얼 종류별로 섞어 먹어보기", "🦸‍♂️ 마블 영화 타임라인 순서대로 보기", "🦦 동물농장 하이라이트 보며 힐링",
+            "📹 틱톡/릴스 춤 연습해보기 (아무도 못 봄)", "🌵 반려식물에게 크리스마스 인사 건네기", "🥢 라면 3개 끓여서 김치랑 흡입",
+            "🧖‍♂️ 찜질방 가서 식혜에 맥반석 계란", "🎭 추리 소설 읽으며 범인 맞히기", "🎳 볼링장 가서 스트라이크 연습",
+            "🎣 실내 낚시터 가서 강태공 되어보기", "🍦 아이스크림 케이크 혼자 숟가락으로 먹기", "🍷 와인 한 병 사서 분위기 잡기",
+            "🖼️ 전시회 혼자 가서 교양 쌓기", "🛌 하루종일 잠옷 입고 생활하기 (세수 안 함)", "🧺 밀린 빨래 다 돌리고 섬유유연제 냄새 맡기",
+            "🦶 족욕하며 피로 풀기", "🎧 플레이리스트 정리하고 음악 감상", "💅 셀프 네일 케어 하기",
+            "🧛‍♂️ 드라큘라 영화 보며 마늘빵 먹기", "🦕 공룡 다큐멘터리 보며 동심 찾기"
+        ];
+
+        const quotes = [
+            "산타클로스도 사실 독거노인이다.", "커플은 명절에 헤어지지만, 솔로는 영원하다.", "돈 굳었다. 그 돈으로 치킨 두 마리 먹자.",
+            "외로움은 지능이 높다는 증거다. (아마도)", "루돌프 코가 왜 빨간 줄 아나? 술 마셔서 그렇다.", "예수님도 솔로셨다. 우리는 성인의 길을 걷는 중.",
+            "지금 이불 밖은 위험하다. 따뜻한 네가 승자.", "커플들이 싸우는 동안 우리는 평화를 지켰다.", "크리스마스는 그냥 빨간 날일 뿐이다.",
+            "내 통장이 웃고 있다. 데이트 비용 0원.", "케빈은 영원한 나의 친구.", "혼자 있는 것은 훌륭하다. 케이크를 안 나눠도 되니까.",
+            "솔로가 아니라 '자유로운 영혼'이라고 불러라.", "오늘 헬스장은 우리 것이다. 득근하자!", "사랑은 가도 치킨은 남는다.",
+            "너는 외로운 게 아니라 고독을 즐기는 것이다.", "세상에서 제일 완벽한 파트너는 전기장판이다.", "12월 25일은 그냥 수요일(요일)일 뿐.",
+            "선물? 내가 나에게 주는 선물이 최고다.", "남들 눈치 안 보고 트림할 수 있는 자유.", "우리는 환경보호 운동가다. (데이트 쓰레기 0)",
+            "내년에는 생기겠지? (아마도)", "스님과 신부님도 오늘은 혼자 기도하신다.", "연애세포가 동면 중일 뿐이다.",
+            "지금 헤어지면 내년 크리스마스도 혼자다.", "오늘 넷플릭스 서버는 우리가 지킨다.", "커플지옥 솔로천국은 과학이다.",
+            "울지마라. 산타 할아버지는 우는 애한테 선물 안 준다.", "너만 없는 거 아니다. 나도 없다.", "인생은 독고다이.",
+            "오늘 뭐 입을지 고민 안 해도 된다. 잠옷 최고.", "크리스마스 이브? 그냥 24일 밤이다.", "혼자 영화관 가면 양쪽 팔걸이 다 내 꺼.",
+            "뷔페 혼자 가면 눈치 안 보고 10접시 가능.", "우리의 전성기는 아직 오지 않았다.", "솔로라서 다행이다. 선물 고르는 스트레스 0.",
+            "잠이 보약이다. 푹 자면 피부 좋아짐.", "거리에 나가면 추울 뿐이다. 집이 최고.", "내 짝은 아직 태어나지 않았을 수도 있다.",
+            "외로움을 즐기는 자가 진정한 챔피언.", "진정한 자유는 솔로일 때 온다.", "남의 연애사 구경하는 게 제일 재밌다.",
+            "커플들은 지금쯤 싸우고 있을 것이다.", "이불 속이 제일 안전해.", "나 자신을 사랑하는 게 최고의 로맨스다.",
+            "솔로라서 외로운 게 아니라, 배고파서 외로운 거다.", "오늘만 지나면 내 세상이다.", "눈? 그냥 하늘에서 내리는 쓰레기일 뿐.",
+            "커플 요금제 안 써도 데이터 남는다.", "내 인생의 주인공은 나다. 조연 필요 없음."
+        ];
+
+        let isSpinning = false;
+        
+        // [추가] 룰렛 효과음 함수
+        function playRouletteSound(type) {
+            // 오디오 컨텍스트 확인 및 재개
+            if (!audioCtx) initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'tick') {
+                // 회전 소리: 짧은 클릭음 (높은 피치에서 빠르게 떨어짐)
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+                
+                gainNode.gain.setValueAtTime(0.05, now); // 볼륨은 작게
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'win') {
+                // 당첨 소리: 띠링! (두 개의 톤)
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+
+                // 첫 번째 톤 (C5)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); 
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                
+                // 두 번째 톤 (E5) - 살짝 늦게 시작
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, now + 0.1); 
+                gain2.gain.setValueAtTime(0.2, now + 0.1);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
+                osc.start(now);
+                osc.stop(now + 1.0);
+                osc2.start(now + 0.1);
+                osc2.stop(now + 1.1);
+            }
+        }
+
+        function spinRoulette() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            // 룰렛 시작 시 오디오 깨우기
+            if (!audioCtx) initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const display = document.getElementById('activity-text');
+            let count = 0;
+            const maxCount = 20; 
+            const speed = 50; 
+
+            const interval = setInterval(() => {
+                const randomIdx = Math.floor(Math.random() * activities.length);
+                display.innerText = activities[randomIdx];
+                
+                // 회전 소리 재생
+                playRouletteSound('tick');
+                
+                count++;
+
+                if (count >= maxCount) {
+                    clearInterval(interval);
+                    isSpinning = false;
+                    
+                    // 당첨 소리 재생
+                    playRouletteSound('win');
+                    
+                    // [수정] JS로 스타일 변경 시 !important 적용
+                    display.style.setProperty('color', '#ef4444', 'important'); // 빨간색 강조
+                    setTimeout(() => {
+                        display.style.setProperty('color', '#1e293b', 'important'); // 원래 색 복귀
+                    }, 300);
+                    
+                    // 명언도 같이 랜덤 변경
+                    const quoteIdx = Math.floor(Math.random() * quotes.length);
+                    document.getElementById('quote-text').innerText = quotes[quoteIdx];
+                }
+            }, speed);
+        }
+
+        // --- 오디오 시스템 (Web Audio API) ---
+        let audioCtx = null;
+        let isPlaying = false;
+        let nextNoteTime = 0;
+        let timerID = null;
+        let currentNoteIndex = 0;
+
+        // 1. 우울한 멜로디 (A Minor)
+        const gloomyMelody = [
+            { freq: 329.63, dur: 1.0 }, { freq: 246.94, dur: 1.0 }, { freq: 261.63, dur: 0.5 }, { freq: 293.66, dur: 0.5 },
+            { freq: 261.63, dur: 0.5 }, { freq: 246.94, dur: 0.5 }, { freq: 220.00, dur: 2.0 }, { freq: 0, dur: 0.5 },
+            { freq: 261.63, dur: 1.0 }, { freq: 329.63, dur: 1.0 }, { freq: 440.00, dur: 2.0 }, { freq: 392.00, dur: 1.0 },
+            { freq: 349.23, dur: 1.0 }, { freq: 329.63, dur: 2.0 }, { freq: 0, dur: 1.0 }
+        ];
+
+        // 2. [추가] 신나는 승리 멜로디 (C Major Fanfare)
+        const victoryMelody = [
+            { freq: 523.25, dur: 0.2 }, { freq: 523.25, dur: 0.2 }, { freq: 523.25, dur: 0.2 }, { freq: 0, dur: 0.1 }, // C C C
+            { freq: 523.25, dur: 0.4 }, { freq: 659.25, dur: 0.4 }, // C E
+            { freq: 783.99, dur: 0.4 }, { freq: 1046.50, dur: 0.8 }, // G C(high)
+            { freq: 783.99, dur: 0.2 }, { freq: 1046.50, dur: 1.0 }  // G C(high)
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, duration, startTime) {
+            if (freq === 0) return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // 상태에 따라 파형 변경 (우울: sine, 신남: square/sawtooth)
+            osc.type = isEscaped ? 'square' : 'sine';
+            osc.frequency.value = freq;
+            
+            const volume = isEscaped ? 0.05 : 0.15; // 신나는 건 좀 작게 (귀 아픔 방지)
+
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function scheduler() {
+            // 현재 상태에 맞는 멜로디 선택
+            const activeMelody = isEscaped ? victoryMelody : gloomyMelody;
+            // 템포 조절 (우울: 0.8배 느리게, 신남: 0.4배 빠르게)
+            const speedFactor = isEscaped ? 0.4 : 0.8;
+
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                const note = activeMelody[currentNoteIndex];
+                const realDuration = note.dur * speedFactor;
+                
+                playTone(note.freq, realDuration, nextNoteTime);
+                
+                nextNoteTime += realDuration;
+                currentNoteIndex++;
+                
+                if (currentNoteIndex >= activeMelody.length) {
+                    currentNoteIndex = 0; // 반복
+                    if (isEscaped) nextNoteTime += 0.5; // 승리 음악은 루프 간격 둠
+                }
+            }
+            timerID = requestAnimationFrame(scheduler);
+        }
+
+        function toggleMusic() {
+            const icon = document.getElementById('music-icon');
+            const text = document.getElementById('music-text');
+            const btn = document.getElementById('music-btn');
+
+            if (isPlaying) {
+                if (timerID) cancelAnimationFrame(timerID);
+                if (audioCtx) audioCtx.suspend();
+                isPlaying = false;
+                
+                const label = isEscaped ? "Victory BGM" : "BGM ON (우울함 주의)";
+                text.textContent = label;
+                icon.setAttribute('data-lucide', 'music');
+                
+                // 스타일 Off
+                btn.classList.remove('bg-gray-800', 'text-gray-300', 'border-gray-600', 'bg-blue-600', 'text-white', 'border-blue-400');
+                btn.classList.add('bg-black/40', 'text-gray-300');
+            } else {
+                initAudio();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                nextNoteTime = audioCtx.currentTime + 0.1;
+                currentNoteIndex = 0;
+                scheduler();
+                
+                isPlaying = true;
+                icon.setAttribute('data-lucide', 'volume-2');
+                
+                if (isEscaped) {
+                    text.textContent = "PARTY TIME!!";
+                    // 파티 모드 버튼 스타일
+                    btn.classList.remove('bg-black/40', 'text-gray-300');
+                    btn.classList.add('bg-blue-600', 'text-white', 'border-blue-400');
+                } else {
+                    text.textContent = "Playing Gloomy...";
+                    // 우울 모드 버튼 스타일
+                    btn.classList.remove('bg-black/40');
+                    btn.classList.add('bg-gray-800', 'text-gray-300', 'border-gray-600');
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // 초기화
+        lucide.createIcons();
+        createParticles();
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+    </script>
