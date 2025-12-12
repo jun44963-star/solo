@@ -5,157 +5,159 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Merry Solo Christmas</title>
 
-  <!-- Tailwind + Lucide -->
+  <!-- CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body{margin:0; background:#070b14; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+    /* 페이지 바탕 */
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      background:#070b14;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 24px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", sans-serif;
+    }
+
+    /* 파티클(눈/폭죽) */
+    #snow-container .snowflake{
+      position:absolute;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 0 10px rgba(255,255,255,0.35);
+      will-change: transform;
+      animation-timing-function: linear;
+      user-select:none;
+      pointer-events:none;
+    }
+    @keyframes fall { to { transform: translateY(120vh); } }
+    @keyframes shake-snow { 0%,100%{ margin-left:0 } 50%{ margin-left:18px } }
+
+    #snow-container .confetti-particle{
+      position:absolute;
+      width:6px;
+      height:10px;
+      border-radius: 3px;
+      opacity:0.95;
+      will-change: transform, opacity;
+      animation-timing-function: ease-out;
+      pointer-events:none;
+    }
+    @keyframes rise {
+      0% { transform: translateY(20px) rotate(0deg); opacity: 0.0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(720deg); opacity: 0.0; }
+    }
+
+    /* 탈출 상태 배경 */
+    #solo-xmas-widget.escaped{
+      background: radial-gradient(900px 500px at 50% 0%, rgba(59,130,246,0.35), transparent 60%),
+                  radial-gradient(900px 500px at 0% 100%, rgba(255,215,0,0.28), transparent 60%),
+                  linear-gradient(135deg, #070b14, #071a2d) !important;
+      border-color: rgba(59,130,246,0.55) !important;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- 위젯 시작 -->
-  <!-- ✅ 여기 자리에 “수정본 통합 코드”의 위젯(div+style+script) 전체를 넣어주세요 -->
-  <!-- 위젯 끝 -->
+  <div id="solo-xmas-widget"
+    class="w-full max-w-lg mx-auto rounded-3xl shadow-2xl p-6 md:p-8 text-center border-4 border-yellow-400/30 relative overflow-hidden"
+    style="background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.18), transparent 60%),
+           linear-gradient(135deg, #0b1220, #08101b);"
+  >
+    <!-- 눈/파티클 생성 영역 -->
+    <div id="snow-container" class="absolute inset-0 pointer-events-none z-0"></div>
 
-</body>
-</html>
-<p data-ke-size="size16">&nbsp;</p>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-
-<!-- 위젯 시작 -->
-<div id="solo-xmas-widget"
-  class="w-full max-w-lg mx-auto rounded-3xl shadow-2xl p-6 md:p-8 text-center border-4 border-yellow-400/30 relative overflow-hidden"
-  style="background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.18), transparent 60%),
-         linear-gradient(135deg, #0b1220, #08101b);"
->
-  <!-- 눈/파티클 생성 영역 -->
-  <div id="snow-container" class="absolute inset-0 pointer-events-none z-0"></div>
-
-  <!-- 공유 버튼 (좌측 상단) -->
-  <button id="share-btn" type="button" class="absolute top-4 left-4 z-50">
-    <div class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-200 hover:bg-black/60 transition-all border border-gray-500/50">
-      <i data-lucide="share-2" class="w-4 h-4"></i> <span>공유</span>
-    </div>
-  </button>
-
-  <!-- 배경음악 컨트롤 (우측 상단) -->
-  <button id="music-btn" type="button" class="absolute top-4 right-4 z-50">
-    <div class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-200 hover:bg-black/60 transition-all border border-gray-500/50">
-      <i id="music-icon" data-lucide="music" class="w-4 h-4"></i>
-      <span id="music-text">BGM ON</span>
-    </div>
-  </button>
-
-  <!-- 헤더 -->
-  <header id="egg-target" class="relative z-10 mb-8 mt-8 cursor-pointer select-none">
-    <div class="flex justify-center items-center gap-2 mb-2">
-      <i id="header-icon-1" data-lucide="snowflake" class="w-6 h-6 text-blue-200"></i>
-      <i id="header-icon-2" data-lucide="sparkles" class="w-6 h-6 text-yellow-200"></i>
-    </div>
-
-    <h1 id="main-title" class="text-3xl md:text-4xl font-black text-white drop-shadow-lg mb-2">
-      Merry <span class="text-yellow-300">Solo</span> Christmas
-    </h1>
-    <p id="sub-title" class="text-blue-100 text-sm md:text-base opacity-90">
-      커플들은 춥지만, 우리는 집이라 따뜻하다.
-    </p>
-  </header>
-
-  <!-- 1. 크리스마스 탈출 카운트다운 -->
-  <div id="countdown-box" class="relative z-10 bg-black/30 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20 transition-colors">
-    <h2 id="countdown-title" class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-red-300">
-      <i data-lucide="timer" class="w-5 h-5"></i>
-      <span class="text-xl font-extrabold">크리스마스 탈출까지</span>
-    </h2>
-
-    <div id="countdown" class="text-3xl md:text-5xl font-mono font-bold text-white tracking-widest drop-shadow-md">
-      0일 00:00:00
-    </div>
-    <p id="countdown-desc" class="text-xs text-gray-300 mt-2">12월 26일이 오면 우리는 승리한다.</p>
-  </div>
-
-  <!-- 2. 솔로 활동 랜덤 추천기 -->
-  <div class="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 mb-6 border border-white/20">
-    <h2 class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-green-300">
-      <i data-lucide="gamepad-2" class="w-5 h-5"></i>
-      <span class="text-xl font-extrabold">오늘 뭐하지? (랜덤 추천)</span>
-    </h2>
-
-    <div id="activity-display" class="bg-white/90 rounded-xl p-4 min-h-[120px] flex items-center justify-center mb-4 shadow-inner">
-      <p id="activity-text" class="font-extrabold text-slate-800">버튼을 눌러보세요!</p>
-    </div>
-
-    <button id="roulette-btn" type="button"
-      class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-full font-bold transition-all shadow-lg flex items-center justify-center gap-2 mx-auto w-full md:w-auto">
-      <i data-lucide="dices" class="w-5 h-5"></i> 운명에 맡기기
+    <!-- 공유 버튼 (좌측 상단) -->
+    <button id="share-btn" type="button" class="absolute top-4 left-4 z-50">
+      <div class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-200 hover:bg-black/60 transition-all border border-gray-500/50">
+        <i data-lucide="share-2" class="w-4 h-4"></i> <span>공유</span>
+      </div>
     </button>
-  </div>
 
-  <!-- 3. 오늘의 명언 -->
-  <div class="relative z-10 mt-8 mb-6">
-    <div class="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full text-sm text-yellow-200 border border-yellow-500/30">
-      <i data-lucide="quote" class="w-4 h-4"></i>
-      <span id="quote-text">산타클로스도 사실 독거노인이다.</span>
+    <!-- 배경음악 컨트롤 (우측 상단) -->
+    <button id="music-btn" type="button" class="absolute top-4 right-4 z-50">
+      <div class="bg-black/40 backdrop-blur-sm p-2 rounded-full shadow-lg flex items-center gap-2 text-xs font-bold text-gray-200 hover:bg-black/60 transition-all border border-gray-500/50">
+        <i id="music-icon" data-lucide="music" class="w-4 h-4"></i>
+        <span id="music-text">BGM ON</span>
+      </div>
+    </button>
+
+    <!-- 헤더 (5회 클릭 이스터에그) -->
+    <header id="egg-target" class="relative z-10 mb-8 mt-8 cursor-pointer select-none">
+      <div class="flex justify-center items-center gap-2 mb-2">
+        <i id="header-icon-1" data-lucide="snowflake" class="w-6 h-6 text-blue-200"></i>
+        <i id="header-icon-2" data-lucide="sparkles" class="w-6 h-6 text-yellow-200"></i>
+      </div>
+
+      <h1 id="main-title" class="text-3xl md:text-4xl font-black text-white drop-shadow-lg mb-2">
+        Merry <span class="text-yellow-300">Solo</span> Christmas
+      </h1>
+      <p id="sub-title" class="text-blue-100 text-sm md:text-base opacity-90">
+        커플들은 춥지만, 우리는 집이라 따뜻하다.
+      </p>
+    </header>
+
+    <!-- 1. 크리스마스 탈출 카운트다운 -->
+    <div id="countdown-box" class="relative z-10 bg-black/30 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20 transition-colors">
+      <h2 id="countdown-title" class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-red-300">
+        <i data-lucide="timer" class="w-5 h-5"></i>
+        <span class="text-xl font-extrabold">크리스마스 탈출까지</span>
+      </h2>
+
+      <div id="countdown" class="text-3xl md:text-5xl font-mono font-bold text-white tracking-widest drop-shadow-md">
+        0일 00:00:00
+      </div>
+      <p id="countdown-desc" class="text-xs text-gray-300 mt-2">12월 26일이 오면 우리는 승리한다.</p>
+    </div>
+
+    <!-- 2. 솔로 활동 랜덤 추천기 -->
+    <div class="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 mb-6 border border-white/20">
+      <h2 class="text-lg font-bold mb-4 flex items-center justify-center gap-2 text-green-300">
+        <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+        <span class="text-xl font-extrabold">오늘 뭐하지? (랜덤 추천)</span>
+      </h2>
+
+      <div id="activity-display" class="bg-white/90 rounded-xl p-4 min-h-[120px] flex items-center justify-center mb-4 shadow-inner">
+        <p id="activity-text" class="font-extrabold text-slate-800">버튼을 눌러보세요!</p>
+      </div>
+
+      <button id="roulette-btn" type="button"
+        class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-full font-bold transition-all shadow-lg flex items-center justify-center gap-2 mx-auto w-full md:w-auto">
+        <i data-lucide="dices" class="w-5 h-5"></i> 운명에 맡기기
+      </button>
+    </div>
+
+    <!-- 3. 오늘의 명언 -->
+    <div class="relative z-10 mt-8 mb-6">
+      <div class="inline-flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full text-sm text-yellow-200 border border-yellow-500/30">
+        <i data-lucide="quote" class="w-4 h-4"></i>
+        <span id="quote-text">산타클로스도 사실 독거노인이다.</span>
+      </div>
+    </div>
+
+    <!-- 제작자 링크 -->
+    <div class="relative z-10 pt-4 border-t border-white/10">
+      <a class="text-xs text-gray-300 hover:text-white transition-colors flex items-center justify-center gap-1"
+        href="https://hjkim20089.tistory.com/" target="_blank" rel="noopener">
+        <i data-lucide="home" class="w-4 h-4"></i> Made by HJKIM
+      </a>
     </div>
   </div>
-
-  <!-- 제작자 링크 -->
-  <div class="relative z-10 pt-4 border-t border-white/10">
-    <a class="text-xs text-gray-300 hover:text-white transition-colors flex items-center justify-center gap-1"
-      href="https://hjkim20089.tistory.com/" target="_blank" rel="noopener">
-      <i data-lucide="home" class="w-4 h-4"></i> Made by HJKIM
-    </a>
-  </div>
-</div>
-
-<style>
-  /* --- 눈송이 --- */
-  #snow-container .snowflake{
-    position:absolute;
-    color: rgba(255,255,255,0.9);
-    text-shadow: 0 0 10px rgba(255,255,255,0.35);
-    will-change: transform;
-    animation-timing-function: linear;
-    user-select:none;
-  }
-  @keyframes fall { to { transform: translateY(120vh); } }
-  @keyframes shake-snow { 0%,100%{ margin-left:0 } 50%{ margin-left:18px } }
-
-  /* --- 탈출 성공 파티클 --- */
-  #snow-container .confetti-particle{
-    position:absolute;
-    width:6px;
-    height:10px;
-    border-radius: 3px;
-    opacity:0.95;
-    will-change: transform, opacity;
-    animation-timing-function: ease-out;
-  }
-  @keyframes rise {
-    0% { transform: translateY(20px) rotate(0deg); opacity: 0.0; }
-    10% { opacity: 1; }
-    100% { transform: translateY(-120vh) rotate(720deg); opacity: 0.0; }
-  }
-
-  /* 탈출 상태 배경 */
-  #solo-xmas-widget.escaped{
-    background: radial-gradient(900px 500px at 50% 0%, rgba(59,130,246,0.35), transparent 60%),
-                radial-gradient(900px 500px at 0% 100%, rgba(255,215,0,0.28), transparent 60%),
-                linear-gradient(135deg, #070b14, #071a2d);
-    border-color: rgba(59,130,246,0.55);
-  }
-</style>
+  <!-- 위젯 끝 -->
 
 <script>
 (() => {
+  // ===== 상태 =====
   let isEscaped = false;
   let eggCount = 0;
   let isSpinning = false;
 
-  // --- 오디오 시스템 ---
+  // ===== 오디오 시스템 =====
   let audioCtx = null;
   let isPlaying = false;
   let nextNoteTime = 0;
@@ -186,7 +188,6 @@
 
   function playTone(freq, duration, startTime) {
     if (freq === 0 || !audioCtx) return;
-
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
 
@@ -194,7 +195,6 @@
     osc.frequency.value = freq;
 
     const volume = isEscaped ? 0.05 : 0.12;
-
     gainNode.gain.setValueAtTime(0.0001, startTime);
     gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.03);
     gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
@@ -207,19 +207,18 @@
   }
 
   function scheduler() {
-    const activeMelody = isEscaped ? victoryMelody : gloomyMelody;
+    const active = isEscaped ? victoryMelody : gloomyMelody;
     const speedFactor = isEscaped ? 0.4 : 0.8;
 
     while (nextNoteTime < audioCtx.currentTime + 0.1) {
-      const note = activeMelody[currentNoteIndex];
+      const note = active[currentNoteIndex];
       const realDuration = note.dur * speedFactor;
 
       playTone(note.freq, realDuration, nextNoteTime);
 
       nextNoteTime += realDuration;
       currentNoteIndex++;
-
-      if (currentNoteIndex >= activeMelody.length) {
+      if (currentNoteIndex >= active.length) {
         currentNoteIndex = 0;
         if (isEscaped) nextNoteTime += 0.5;
       }
@@ -251,7 +250,44 @@
     lucide.createIcons();
   }
 
-  // --- 눈/파티클 ---
+  // ===== 룰렛 효과음 =====
+  function playRouletteSound(type) {
+    if (!audioCtx) initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'tick') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
+    } else {
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+
+      osc.type = 'sine';  osc.frequency.setValueAtTime(523.25, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+      osc2.type = 'sine'; osc2.frequency.setValueAtTime(659.25, now + 0.08);
+      gain2.gain.setValueAtTime(0.15, now + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.88);
+
+      osc.start(now); osc.stop(now + 0.8);
+      osc2.start(now + 0.08); osc2.stop(now + 0.88);
+    }
+  }
+
+  // ===== 파티클 =====
   function createParticles() {
     const container = document.getElementById('snow-container');
     if (!container) return;
@@ -281,14 +317,17 @@
     }
   }
 
-  // --- 카운트다운 ---
+  // ===== 카운트다운 =====
   function updateCountdown() {
     if (isEscaped) return;
 
     const now = new Date();
     const y = now.getFullYear();
+
+    // 목표: 12/26 00:00:00
     let target = new Date(y, 11, 26, 0, 0, 0);
 
+    // 12/26~12/31이면 "탈출 성공" 처리
     if (now >= target && now.getMonth() === 11 && now.getDate() >= 26) {
       celebrateEscape();
       return;
@@ -325,18 +364,19 @@
     document.getElementById('countdown').classList.add('text-yellow-200');
     document.getElementById('countdown-desc').innerText = "커플들의 축제는 끝났다. 이제 우리의 세상이다.";
 
-    // 아이콘 변경 (존재하므로 에러 없음)
     document.getElementById('header-icon-1').setAttribute('data-lucide', 'crown');
     document.getElementById('header-icon-2').setAttribute('data-lucide', 'thumbs-up');
     lucide.createIcons();
 
     createParticles();
 
-    // 음악 상태 반영
-    const mt = document.getElementById('music-text');
-    if (!isPlaying) mt.textContent = "Victory BGM";
+    // 음악이 꺼져있으면 라벨만
+    if (!isPlaying) {
+      document.getElementById('music-text').textContent = "Victory BGM";
+    }
   }
 
+  // ===== 이스터에그 =====
   function triggerEasterEgg() {
     if (isEscaped) return;
     eggCount++;
@@ -346,23 +386,32 @@
     }
   }
 
-  function shareLink() {
+  // ===== 공유 =====
+  async function shareLink() {
     const url = window.location.href;
     try {
-      navigator.clipboard.writeText(url);
-      alert("링크가 복사되었습니다! 솔로 친구들에게 전파하세요 🎄");
-    } catch(e) {
-      const dummy = document.createElement("textarea");
-      document.body.appendChild(dummy);
-      dummy.value = url;
-      dummy.select();
-      document.execCommand("copy");
-      document.body.removeChild(dummy);
-      alert("링크가 복사되었습니다! 솔로 친구들에게 전파하세요 🎄");
+      if (navigator.share) {
+        await navigator.share({ title: "Merry Solo Christmas", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("링크가 복사되었습니다! 솔로 친구들에게 전파하세요 🎄");
+      }
+    } catch (e) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        alert("링크가 복사되었습니다! 솔로 친구들에게 전파하세요 🎄");
+      } catch (_) {
+        alert("복사에 실패했습니다. 주소창 링크를 직접 복사해주세요!");
+      }
     }
   }
 
-  // --- 랜덤 추천 데이터 ---
+  // ===== 랜덤 추천 데이터 =====
   const activities = [
     "🍕 치킨+피자 시키고 '나홀로 집에' 정주행", "🎮 밀린 게임 엔딩 볼 때까지 못 잠", "📚 만화카페 가서 짜장라면에 뒹굴기",
     "💤 24시간 동면 (일어나면 26일임)", "🍜 뜨끈한 국밥 한 그릇 때리고 사우나", "🧹 대청소하고 새 마음으로 새해 맞이하기",
@@ -370,49 +419,23 @@
     "🍺 혼술하며 옛날 예능 하이라이트 보기", "🎤 코인노래방 가서 1만원어치 지르기", "🏃‍♂️ 아무도 없는 헬스장에서 황제 헬스",
     "🧩 1000피스 직소 퍼즐 맞추기 도전", "📱 유튜브 알고리즘 탐험하며 시간 순삭", "🍳 유튜브 보고 백종원 레시피 따라하기",
     "🛀 거품 입욕제 넣고 뜨끈한 반신욕", "✍️ 내년 계획 다이어리에 끄적이기", "🍫 누텔라 한 통 숟가락으로 퍼먹기",
-    "🏰 레고 조립하며 무념무상 즐기기", "🐱 고양이/강아지 츄르 주며 주인님 모시기", "🍿 넷플릭스 랭킹 1위부터 5위까지 정복"
+    "🏰 레고 조립하며 무념무상 즐기기", "🐱 고양이/강아지 츄르 주며 주인님 모시기",
+    "🍿 넷플릭스 랭킹 1위부터 5위까지 정복", "🛌 전기장판 틀고 귤 까먹으며 웹툰 정주행",
+    "🥩 혼자 고깃집 가서 3인분 클리어 도전", "🧖‍♂️ 찜질방 가서 식혜에 맥반석 계란",
+    "🎧 플레이리스트 정리하고 음악 감상", "💻 블로그 글 하나 써보기", "🦸‍♂️ 마블 영화 타임라인 순서대로 보기"
   ];
 
   const quotes = [
-    "산타클로스도 사실 독거노인이다.", "커플은 명절에 헤어지지만, 솔로는 영원하다.", "돈 굳었다. 그 돈으로 치킨 두 마리 먹자.",
-    "외로움은 지능이 높다는 증거다. (아마도)", "예수님도 솔로셨다. 우리는 성인의 길을 걷는 중.",
-    "세상에서 제일 완벽한 파트너는 전기장판이다.", "솔로가 아니라 '자유로운 영혼'이라고 불러라."
+    "산타클로스도 사실 독거노인이다.",
+    "커플은 명절에 헤어지지만, 솔로는 영원하다.",
+    "돈 굳었다. 그 돈으로 치킨 두 마리 먹자.",
+    "외로움은 지능이 높다는 증거다. (아마도)",
+    "예수님도 솔로셨다. 우리는 성인의 길을 걷는 중.",
+    "세상에서 제일 완벽한 파트너는 전기장판이다.",
+    "솔로가 아니라 '자유로운 영혼'이라고 불러라.",
+    "커플지옥 솔로천국은 과학이다.",
+    "내 통장이 웃고 있다. 데이트 비용 0원."
   ];
-
-  function playRouletteSound(type) {
-    if (!audioCtx) initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    if (type === 'tick') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
-      gainNode.gain.setValueAtTime(0.05, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-      osc.start(now); osc.stop(now + 0.05);
-    } else {
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.connect(gain2); gain2.connect(audioCtx.destination);
-
-      osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now);
-      gainNode.gain.setValueAtTime(0.15, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-      osc2.type = 'sine'; osc2.frequency.setValueAtTime(659.25, now + 0.08);
-      gain2.gain.setValueAtTime(0.15, now + 0.08);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.88);
-
-      osc.start(now); osc.stop(now + 0.8);
-      osc2.start(now + 0.08); osc2.stop(now + 0.88);
-    }
-  }
 
   function spinRoulette() {
     if (isSpinning) return;
@@ -440,13 +463,13 @@
         display.style.setProperty('color', '#ef4444', 'important');
         setTimeout(() => display.style.setProperty('color', '#1e293b', 'important'), 300);
 
-        const quoteIdx = Math.floor(Math.random() * quotes.length);
-        document.getElementById('quote-text').innerText = quotes[quoteIdx];
+        const q = Math.floor(Math.random() * quotes.length);
+        document.getElementById('quote-text').innerText = quotes[q];
       }
     }, speed);
   }
 
-  // --- DOM 연결 (중요: 티스토리에서 로딩 타이밍 문제 방지) ---
+  // ===== 초기 연결 =====
   document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     createParticles();
@@ -461,3 +484,5 @@
 })();
 </script>
 
+</body>
+</html>
